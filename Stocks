@@ -1,0 +1,43 @@
+import yfinance as yf
+import time
+
+# Define the stock tickers and the number of shares owned
+portfolio = {
+    'IVV': 4,    # iShares Core S&P 500 ETF
+    'JEPI': 57,  # JPMorgan Equity Premium Income ETF
+    'JEPQ': 50,  # JPMorgan Nasdaq Equity Premium Income ETF
+    'VOO': 3.666, # Vanguard S&P 500 ETF
+    'VOOG': 5    # Vanguard S&P 500 Growth ETF
+}
+
+# Starting investment amount
+starting_investment = 12000
+
+def get_stock_data(ticker):
+    """Fetch the current stock data using yfinance."""
+    stock = yf.Ticker(ticker)
+    price = stock.history(period="1d")['Close'][0]  # Fetch latest closing price
+    return price
+
+def track_portfolio():
+    total_value = 0
+    print(f"{'Ticker':<10}{'Shares':<10}{'Price':<10}{'Value':<10}{'Change':<10}")
+    print("-" * 50)
+    
+    for ticker, shares in portfolio.items():
+        current_price = get_stock_data(ticker)
+        stock_value = shares * current_price
+        price_change = current_price - yf.Ticker(ticker).history(period="1d")['Open'][0]  # Price change today
+        
+        total_value += stock_value
+        print(f"{ticker:<10}{shares:<10}{current_price:<10.2f}{stock_value:<10.2f}{price_change:<10.2f}")
+
+    # Display total value and profit/loss
+    profit_loss = total_value - starting_investment
+    print(f"\nTotal Portfolio Value: ${total_value:.2f}")
+    print(f"Profit/Loss: ${profit_loss:.2f}")
+
+if __name__ == "__main__":
+    while True:
+        track_portfolio()
+        time.sleep(60)  # Update every minute
